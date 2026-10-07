@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storan Manager Pro</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+    --bg:#06080f;
+    --panel:rgba(16,22,34,.78);
+    --panel-solid:#0e1420;
+    --field:#0a0f19;
+    --border:rgba(255,255,255,.07);
+    --border-strong:rgba(255,255,255,.12);
+    --text:#f3f6fc;
+    --muted:#8590a6;
+    --dim:#5a657b;
+    --purple:#8b7bff;
+    --blue:#4c8dff;
+    --cyan:#38d9c0;
+    --green:#4de39b;
+    --red:#ff7b7b;
+    --yellow:#ffc861;
+    --pink:#ff7aa8;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+    font-family:Inter,"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    background:
+        radial-gradient(900px 500px at 8% -5%,rgba(139,123,255,.20),transparent 60%),
+        radial-gradient(800px 500px at 100% 100%,rgba(56,217,192,.12),transparent 60%),
+        radial-gradient(600px 400px at 95% 0%,rgba(76,141,255,.10),transparent 60%),
+        var(--bg);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+}
+
+button,input{font-family:inherit}
+button{cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+
+.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.i.sm{width:15px;height:15px}
+.i.lg{width:22px;height:22px}
+
+.container{width:min(1240px,94%);margin:auto;padding:22px 0 60px}
+
+/* ============ TOPBAR ============ */
+.topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:12px 16px;margin-bottom:24px;
+    border:1px solid var(--border);border-radius:20px;
+    background:var(--panel);backdrop-filter:blur(18px);
+    position:sticky;top:12px;z-index:20;
+}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{
+    width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--purple),var(--cyan));
+    box-shadow:0 8px 28px rgba(139,123,255,.35),inset 0 1px 0 rgba(255,255,255,.35);
+    color:#fff;
+}
+.logo .i{width:24px;height:24px}
+.brand h1{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.brand h1 span{
+    background:linear-gradient(90deg,var(--purple),var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.brand p{color:var(--muted);font-size:11.5px;margin-top:2px}
+
+.nav{display:flex;gap:4px}
+.nav a{
+    display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:11px;
+    color:var(--muted);font-size:12.5px;font-weight:600;text-decoration:none;transition:.2s;
+}
+.nav a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+
+.top-right{display:flex;align-items:center;gap:10px}
+.datebox{
+    display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:11px;
+    background:rgba(255,255,255,.04);border:1px solid var(--border);
+    color:var(--muted);font-size:11.5px;
+}
+.live{
+    display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:30px;
+    background:rgba(77,227,155,.08);border:1px solid rgba(77,227,155,.18);
+    color:var(--green);font-size:11px;font-weight:700;letter-spacing:.4px;
+}
+.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 0 0 rgba(77,227,155,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(77,227,155,0)}100%{box-shadow:0 0 0 0 rgba(77,227,155,0)}}
+
+/* ============ PAGE TITLE ============ */
+.page-title{margin-bottom:18px}
+.page-title h2{font-size:24px;font-weight:800;letter-spacing:-.4px}
+.page-title p{color:var(--muted);font-size:13px;margin-top:5px}
+
+/* ============ STATS ============ */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+
+.stat{
+    position:relative;overflow:hidden;padding:20px;border-radius:20px;
+    border:1px solid var(--border);background:var(--panel);backdrop-filter:blur(16px);
+    transition:.25s;
+}
+.stat::before{
+    content:"";position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;
+    background:var(--acc);opacity:.13;filter:blur(24px);transition:.3s;
+}
+.stat:hover{transform:translateY(-3px);border-color:var(--border-strong)}
+.stat:hover::before{opacity:.25}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.stat-icon{
+    width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+    color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,transparent);
+    border:1px solid color-mix(in srgb,var(--acc) 25%,transparent);
+}
+.pill{
+    font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:20px;
+    color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent);
+}
+.stat small{color:var(--muted);font-size:12px;font-weight:500}
+.stat h3{margin-top:6px;font-size:25px;font-weight:800;letter-spacing:-.6px}
+.stat .hint{margin-top:7px;font-size:11px;color:var(--dim)}
+
+/* ============ PANEL ============ */
+.panel{
+    border:1px solid var(--border);border-radius:22px;background:var(--panel);
+    backdrop-filter:blur(16px);padding:22px;margin-bottom:16px;
+}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.title{display:flex;align-items:center;gap:11px}
+.title-icon{
+    width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+    background:rgba(139,123,255,.12);color:var(--purple);border:1px solid rgba(139,123,255,.2);
+}
+.title b{font-size:15.5px;font-weight:800;display:block}
+.title span{color:var(--muted);font-size:11.5px;display:block;margin-top:2px}
+
+.grid-2{display:grid;grid-template-columns:1.7fr 1fr;gap:16px}
+.grid-2 > .panel{margin-bottom:16px}
+.grid-form{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.grid-form > .panel{margin-bottom:16px}
+
+/* ============ FORM ============ */
+.form{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px}
+.field{position:relative}
+.field label{display:block;font-size:10.5px;color:var(--muted);margin-bottom:6px;font-weight:600;letter-spacing:.3px}
+.input{
+    width:100%;border:1px solid #232c3e;outline:none;background:var(--field);color:#fff;
+    padding:12px 14px;border-radius:12px;font-size:13.5px;transition:.2s;
+}
+.input:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(139,123,255,.12)}
+.input::placeholder{color:#4d586d}
+
+.btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border:none;border-radius:12px;padding:12px 18px;color:#fff;font-weight:700;font-size:13px;
+    background:linear-gradient(135deg,var(--purple),#5b7bff);
+    box-shadow:0 8px 24px rgba(107,110,255,.28);transition:.2s;
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn.full{width:100%;margin-top:12px}
+
+.btn-ghost{
+    display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:11px;
+    background:rgba(255,255,255,.04);border:1px solid var(--border);color:#c6cedd;
+    font-size:12px;font-weight:600;transition:.2s;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn-ghost.danger{color:var(--red);background:rgba(255,123,123,.07);border-color:rgba(255,123,123,.18)}
+.btn-ghost.danger:hover{background:rgba(255,123,123,.14)}
+
+.info-box{
+    margin-top:14px;padding:12px 14px;border-radius:12px;display:flex;gap:10px;align-items:flex-start;
+    background:rgba(76,141,255,.07);border:1px solid rgba(76,141,255,.15);
+    color:#a2b0c9;font-size:12px;line-height:1.5;
+}
+.info-box .i{color:var(--blue);margin-top:1px}
+.info-box strong{color:var(--green)}
+
+.settings{display:grid;gap:12px}
+.setting{background:var(--field);border:1px solid #232c3e;padding:13px 14px;border-radius:14px;transition:.2s}
+.setting:focus-within{border-color:var(--purple)}
+.setting label{display:block;font-size:10.5px;color:var(--muted);margin-bottom:6px;font-weight:600;letter-spacing:.3px}
+.setting input{width:100%;background:transparent;color:#fff;border:none;outline:none;font-size:17px;font-weight:800}
+
+.margin-card{
+    margin-top:12px;padding:15px;border-radius:14px;
+    background:linear-gradient(135deg,rgba(77,227,155,.10),rgba(56,217,192,.05));
+    border:1px solid rgba(77,227,155,.18);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.margin-card small{color:#9bb8ab;font-size:11px;display:block}
+.margin-card b{color:var(--green);font-size:20px;font-weight:800}
+.margin-card .pct{
+    font-size:12px;font-weight:800;color:var(--green);padding:6px 11px;border-radius:20px;
+    background:rgba(77,227,155,.12)
+}
+
+/* ============ CHART ============ */
+.tabs{display:inline-flex;padding:4px;border-radius:13px;background:var(--field);border:1px solid var(--border)}
+.tab{
+    display:flex;align-items:center;gap:7px;border:none;background:transparent;color:var(--muted);
+    padding:8px 13px;border-radius:10px;font-size:12px;font-weight:700;transition:.2s;
+}
+.tab.active{color:#fff;background:linear-gradient(135deg,rgba(139,123,255,.9),rgba(91,123,255,.9));box-shadow:0 4px 16px rgba(107,110,255,.3)}
+
+.chart-box{position:relative;width:100%}
+canvas{width:100%;display:block}
+#profitChart{height:330px}
+#donutChart{width:190px;height:190px;margin:0 auto}
+
+.tooltip{
+    position:absolute;pointer-events:none;opacity:0;transform:translate(-50%,-110%);
+    background:#0b111c;border:1px solid var(--border-strong);border-radius:12px;
+    padding:10px 12px;font-size:11.5px;white-space:nowrap;z-index:5;
+    box-shadow:0 12px 32px rgba(0,0,0,.5);transition:opacity .12s;
+}
+.tooltip b{display:block;font-size:12.5px;margin-bottom:5px}
+.tooltip div{color:var(--muted);margin-top:2px}
+.tooltip em{font-style:normal;color:var(--green);font-weight:700}
+
+.chart-summary{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.chip{
+    display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:11px;
+    background:rgba(255,255,255,.035);border:1px solid var(--border);font-size:11.5px;color:var(--muted);
+}
+.chip b{color:var(--text)}
+.chip .i{color:var(--yellow)}
+
+.legend{display:grid;gap:10px;margin-top:16px}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:12px}
+.swatch{width:10px;height:10px;border-radius:3px;flex:none}
+.legend-item .nm{flex:1;color:#cfd6e4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.legend-item .pc{color:var(--muted);font-weight:700}
+
+/* ============ TABLE ============ */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap .i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--dim)}
+.search{
+    width:100%;border:1px solid #232c3e;outline:none;background:var(--field);color:#fff;
+    border-radius:13px;padding:12px 14px 12px 42px;font-size:13px;transition:.2s;
+}
+.search:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(139,123,255,.12)}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{
+    padding:12px 12px;color:#667189;text-align:left;font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.8px;border-bottom:1px solid #222a39;font-weight:700;
+}
+td{padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.045);font-size:12.5px}
+tbody tr{transition:.15s}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+
+.rank{
+    width:24px;height:24px;border-radius:8px;display:inline-grid;place-items:center;
+    font-size:11px;font-weight:800;color:var(--muted);background:rgba(255,255,255,.05);
+}
+.rank.r1{color:#1b1300;background:linear-gradient(135deg,#ffd978,#ffb347)}
+.rank.r2{color:#10151f;background:linear-gradient(135deg,#e2e8f2,#a9b4c8)}
+.rank.r3{color:#1c0f05;background:linear-gradient(135deg,#f0b48a,#c9803f)}
+
+.person{display:flex;align-items:center;gap:11px}
+.avatar{
+    width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
+    font-size:13px;font-weight:800;color:#fff;
+}
+.person-name{font-weight:700}
+.person-sub{color:var(--dim);font-size:10.5px;margin-top:2px}
+
+.salary{color:#ff9b9b}
+.profit{color:var(--green);font-weight:800}
+.share{display:flex;align-items:center;gap:9px;min-width:110px}
+.bar{flex:1;height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.share span{font-size:11px;color:var(--muted);width:34px;text-align:right}
+
+.badge{
+    display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:8px;
+    background:rgba(77,227,155,.09);color:var(--green);font-size:10.5px;font-weight:700;
+}
+.action{
+    width:32px;height:32px;display:inline-grid;place-items:center;border:1px solid var(--border);
+    border-radius:9px;background:rgba(255,255,255,.04);color:#b7c0d1;margin-right:4px;transition:.2s;
+}
+.action:hover{background:rgba(139,123,255,.15);color:#fff;border-color:rgba(139,123,255,.3)}
+.action.delete:hover{background:rgba(255,123,123,.15);color:var(--red);border-color:rgba(255,123,123,.3)}
+
+/* ============ HISTORY ============ */
+.history-item{display:flex;align-items:center;gap:13px;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.05)}
+.history-item:last-child{border-bottom:none}
+.history-icon{
+    width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;
+    background:rgba(139,123,255,.11);color:var(--purple);
+}
+.history-main{flex:1;min-width:0}
+.history-name{font-size:13px;font-weight:700}
+.history-detail{color:var(--muted);font-size:11px;margin-top:4px}
+.history-right{text-align:right}
+.history-profit{color:var(--green);font-weight:800;font-size:13px}
+.history-time{color:var(--dim);font-size:10px;margin-top:4px}
+
+/* ============ EMPTY / FOOTER / TOAST ============ */
+.empty{text-align:center;padding:38px 10px;color:var(--muted);font-size:13px}
+.empty-icon{
+    width:56px;height:56px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;
+    background:rgba(255,255,255,.04);border:1px dashed var(--border-strong);color:var(--dim);
+}
+.empty-icon .i{width:26px;height:26px}
+
+.footer{text-align:center;color:#4a5469;font-size:11px;margin-top:28px}
+
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:99;display:grid;gap:10px}
+.toast{
+    display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:14px;
+    background:#0d1420;border:1px solid var(--border-strong);box-shadow:0 14px 40px rgba(0,0,0,.55);
+    font-size:13px;animation:toastIn .3s ease;max-width:320px;
+}
+.toast .i{color:var(--green)}
+.toast.err .i{color:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}}
+
+/* ============ MODAL ============ */
+.modal-back{
+    position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:16px;
+    background:rgba(3,6,12,.7);backdrop-filter:blur(6px);
+}
+.modal-back.show{display:flex;animation:fade .15s ease}
+.modal{
+    width:min(400px,100%);padding:24px;border-radius:22px;background:#0e1420;
+    border:1px solid var(--border-strong);box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.modal h4{font-size:17px;font-weight:800;display:flex;align-items:center;gap:10px}
+.modal h4 .m-ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:rgba(139,123,255,.14);color:var(--purple)}
+.modal.danger h4 .m-ic{background:rgba(255,123,123,.14);color:var(--red)}
+.modal p{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.55}
+.modal .m-fields{display:grid;gap:12px;margin-top:16px}
+.modal-actions{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+.modal-actions .btn,.modal-actions .btn-ghost{padding:11px 18px;font-size:13px;justify-content:center}
+.modal.danger #mOk{background:linear-gradient(135deg,#ff7b7b,#e2506a);box-shadow:0 8px 24px rgba(255,100,110,.28)}
+@keyframes fade{from{opacity:0}}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:1000px){
+    .grid-2,.grid-form{grid-template-columns:1fr}
+    .nav{display:none}
+}
+@media(max-width:850px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+    .container{padding-top:14px}
+    .topbar{top:8px;padding:10px 12px}
+    .datebox,.live{display:none}
+    .brand p{display:none}
+    .page-title h2{font-size:20px}
+    .stats{gap:10px}
+    .stat{padding:15px}
+    .stat h3{font-size:18px}
+    .stat-icon{width:36px;height:36px}
+    .pill{display:none}
+    .panel{padding:16px}
+    .form{grid-template-columns:1fr}
+    #profitChart{height:250px}
+    .tab span{display:none}
+    .toast-wrap{left:14px;right:14px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============ ICON SPRITE ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/><path d="M15 8h4v4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-9.5 6.2a2 2 0 0 1-2.1 0L2 7"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 13h2"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-bar" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="1"/><rect x="13" y="7" width="3" height="11" rx="1"/></symbol>
+    <symbol id="i-line" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 6-7"/></symbol>
+    <symbol id="i-pie" viewBox="0 0 24 24"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1Z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="m2 7 5 5 5-8 5 8 5-5-2 12H4Z"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.1 10.4A6 6 0 1 1 10.4 18"/><path d="M7 6h1v4"/></symbol>
+</defs>
+</svg>
+
+<div class="container">
+
+<!-- ================= TOPBAR ================= -->
+<header class="topbar">
+    <div class="brand">
+        <div class="logo"><svg class="i"><use href="#i-logo"/></svg></div>
+        <div>
+            <h1>Storan <span>Manager Pro</span></h1>
+            <p>Dashboard karyawan &amp; keuntungan</p>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <a href="#sec-grafik"><svg class="i sm"><use href="#i-bar"/></svg>Grafik</a>
+        <a href="#sec-input"><svg class="i sm"><use href="#i-plus"/></svg>Input</a>
+        <a href="#sec-karyawan"><svg class="i sm"><use href="#i-users"/></svg>Karyawan</a>
+        <a href="#sec-riwayat"><svg class="i sm"><use href="#i-clock"/></svg>Riwayat</a>
+    </nav>
+
+    <div class="top-right">
+        <div class="datebox"><svg class="i sm"><use href="#i-calendar"/></svg><span id="tanggalHariIni"></span></div>
+        <div class="live"><span class="dot"></span>SISTEM AKTIF</div>
+    </div>
+</header>
+
+<div class="page-title">
+    <h2>Ringkasan Bisnis</h2>
+    <p>Pantau storan Gmail, gaji karyawan, dan keuntungan secara real-time.</p>
+</div>
+
+<!-- ================= STATISTIK ================= -->
+<section class="stats">
+    <div class="stat" style="--acc:var(--purple)">
+        <div class="stat-top">
+            <div class="stat-icon"><svg class="i lg"><use href="#i-users"/></svg></div>
+        </div>
+        <small>Total Karyawan</small>
+        <h3 class="num" id="totalKaryawan">0</h3>
+        <div class="hint" id="hintKaryawan">Belum ada data</div>
+    </div>
+
+    <div class="stat" style="--acc:var(--blue)">
+        <div class="stat-top">
+            <div class="stat-icon"><svg class="i lg"><use href="#i-mail"/></svg></div>
+        </div>
+        <small>Total Gmail STOR</small>
+        <h3 class="num" id="totalGmail">0</h3>
+        <div class="hint" id="hintGmail">Rata-rata 0 / karyawan</div>
+    </div>
+
+    <div class="stat" style="--acc:var(--yellow)">
+        <div class="stat-top">
+            <div class="stat-icon"><svg class="i lg"><use href="#i-wallet"/></svg></div>
+        </div>
+        <small>Total Omzet</small>
+        <h3 class="num" id="totalOmzet">Rp0</h3>
+        <div class="hint" id="hintOmzet">Gaji terbayar Rp0</div>
+    </div>
+
+    <div class="stat" style="--acc:var(--green)">
+        <div class="stat-top">
+            <div class="stat-icon"><svg class="i lg"><use href="#i-trend"/></svg></div>
+            <span class="pill" id="pillMargin">0%</span>
+        </div>
+        <small>Total Keuntungan</small>
+        <h3 class="num" id="totalProfit">Rp0</h3>
+        <div class="hint">Omzet dikurangi gaji</div>
+    </div>
+</section>
+
+<!-- ================= GRAFIK ================= -->
+<section class="grid-2" id="sec-grafik">
+
+    <div class="panel">
+        <div class="panel-head">
+            <div class="title">
+                <div class="title-icon"><svg class="i"><use href="#i-bar"/></svg></div>
+                <div>
+                    <b>Grafik Keuntungan</b>
+                    <span id="chartSubtitle">Keuntungan setiap karyawan</span>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" id="tabKaryawan" onclick="setMode('karyawan')">
+                    <svg class="i sm"><use href="#i-bar"/></svg><span>Per Karyawan</span>
+                </button>
+                <button class="tab" id="tabTren" onclick="setMode('tren')">
+                    <svg class="i sm"><use href="#i-line"/></svg><span>Tren Harian</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="chart-box" id="chartBox">
+            <canvas id="profitChart"></canvas>
+            <div class="tooltip" id="tooltip"></div>
+        </div>
+
+        <div class="chart-summary" id="chartSummary"></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <div class="title">
+                <div class="title-icon"><svg class="i"><use href="#i-pie"/></svg></div>
+                <div>
+                    <b>Kontribusi</b>
+                    <span>Porsi keuntungan</span>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="donutChart"></canvas>
+        <div class="legend" id="legend"></div>
+    </div>
+
+</section>
+
+<!-- ================= INPUT + PENGATURAN ================= -->
+<section class="grid-form" id="sec-input">
+
+    <div class="panel">
+        <div class="panel-head">
+            <div class="title">
+                <div class="title-icon"><svg class="i"><use href="#i-plus"/></svg></div>
+                <div>
+                    <b>Tambah Storan</b>
+                    <span>Masukkan data Gmail yang disetor</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form">
+            <div class="field">
+                <label>NAMA KARYAWAN</label>
+                <input class="input" id="nama" placeholder="Nama karyawan" onkeydown="if(event.key==='Enter')tambahData()">
+            </div>
+            <div class="field">
+                <label>JUMLAH GMAIL</label>
+                <input class="input" id="jumlah" type="number" min="1" placeholder="0" onkeydown="if(event.key==='Enter')tambahData()">
+            </div>
+            <div class="field">
+                <label>HARGA / GMAIL</label>
+                <input class="input" id="harga" type="number" placeholder="Default" onkeydown="if(event.key==='Enter')tambahData()">
+            </div>
+        </div>
+
+        <button class="btn full" onclick="tambahData()">
+            <svg class="i"><use href="#i-plus"/></svg>Tambahkan Storan
+        </button>
+
+        <div class="info-box">
+            <svg class="i sm"><use href="#i-info"/></svg>
+            <div>Jika nama karyawan sudah ada, <strong>Gmail akan ditambahkan ke karyawan tersebut</strong>, bukan membuat karyawan baru.</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <div class="title">
+                <div class="title-icon"><svg class="i"><use href="#i-settings"/></svg></div>
+                <div>
+                    <b>Pengaturan Harga</b>
+                    <span>Harga Gmail &amp; gaji karyawan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="setting">
+                <label>HARGA GMAIL / AKUN (Rp)</label>
+                <input id="hargaDefault" type="number" value="2500" onchange="simpanSetting()">
+            </div>
+            <div class="setting">
+                <label>GAJI KARYAWAN / GMAIL (Rp)</label>
+                <input id="gajiDefault" type="number" value="1000" onchange="simpanSetting()">
+            </div>
+        </div>
+
+        <div class="margin-card">
+            <div>
+                <small>Keuntungan per Gmail</small>
+                <b class="num" id="keuntunganPerGmail">Rp1.500</b>
+            </div>
+            <span class="pct" id="marginPersen">60% margin</span>
+        </div>
+    </div>
+
+</section>
+
+<!-- ================= DATA KARYAWAN ================= -->
+<section class="panel" id="sec-karyawan">
+
+    <div class="panel-head">
+        <div class="title">
+            <div class="title-icon"><svg class="i"><use href="#i-users"/></svg></div>
+            <div>
+                <b>Data Karyawan</b>
+                <span>Satu nama = satu data karyawan</span>
+            </div>
+        </div>
+
+        <button class="btn-ghost danger" onclick="hapusSemua()">
+            <svg class="i sm"><use href="#i-trash"/></svg>Hapus Semua Data
+        </button>
+    </div>
+
+    <div class="search-wrap">
+        <svg class="i"><use href="#i-search"/></svg>
+        <input class="search" id="search" placeholder="Cari nama karyawan..." oninput="tampilkan()">
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Karyawan</th>
+                    <th>Gmail</th>
+                    <th>Omzet</th>
+                    <th>Gaji</th>
+                    <th>Keuntungan</th>
+                    <th>Kontribusi</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabel"></tbody>
+        </table>
+    </div>
+
+    <div id="empty" class="empty">
+        <div class="empty-icon"><svg class="i"><use href="#i-inbox"/></svg></div>
+        Belum ada data karyawan.
+    </div>
+
+</section>
+
+<!-- ================= RIWAYAT ================= -->
+<section class="panel" id="sec-riwayat">
+
+    <div class="panel-head">
+        <div class="title">
+            <div class="title-icon"><svg class="i"><use href="#i-clock"/></svg></div>
+            <div>
+                <b>Riwayat Storan</b>
+                <span>Setiap transaksi tetap dicatat</span>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+            <button class="btn-ghost" onclick="exportCSV()">
+                <svg class="i sm"><use href="#i-download"/></svg>Export CSV
+            </button>
+            <button class="btn-ghost danger" onclick="hapusRiwayat()">
+                <svg class="i sm"><use href="#i-trash"/></svg>Hapus
+            </button>
+        </div>
+    </div>
+
+    <div id="history"></div>
+
+    <div id="historyEmpty" class="empty">
+        <div class="empty-icon"><svg class="i"><use href="#i-clock"/></svg></div>
+        Belum ada riwayat.
+    </div>
+
+</section>
+
+<div class="footer">Storan Manager Pro • Data tersimpan otomatis di perangkat</div>
+
+</div>
+
+<div class="modal-back" id="modalBack">
+    <div class="modal" id="modalBox" role="dialog" aria-modal="true">
+        <h4><span class="m-ic"><svg class="i"><use href="#i-alert"/></svg></span><span id="mTitle"></span></h4>
+        <p id="mMsg"></p>
+        <div class="m-fields" id="mFields"></div>
+        <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="mCancel">Batal</button>
+            <button type="button" class="btn" id="mOk">OK</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+
+/* =====================================================
+   LOAD DATA
+===================================================== */
+
+function bacaStorage(key, fallback){
+    try{
+        const v = localStorage.getItem(key);
+        return v ? JSON.parse(v) : fallback;
+    }catch(e){
+        return fallback;
+    }
+}
+function tulisStorage(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+
+let data = bacaStorage("storanData", []);
+let history = bacaStorage("storanHistory", []);
+let settings = bacaStorage("storanSettings", {harga:2500, gaji:1000});
+
+let chartMode = "karyawan";
+let barHits = [];
+let lineHits = [];
+
+const PALETTE = ["#8b7bff","#38d9c0","#4c8dff","#ffc861","#ff7aa8","#6b7694"];
+const AVATAR_BG = [
+    "linear-gradient(135deg,#8b7bff,#5b7bff)",
+    "linear-gradient(135deg,#38d9c0,#2a9df4)",
+    "linear-gradient(135deg,#ff7aa8,#ff9a6b)",
+    "linear-gradient(135deg,#ffc861,#ff9f43)",
+    "linear-gradient(135deg,#4de39b,#27b6a3)",
+    "linear-gradient(135deg,#a77bff,#e56bff)"
+];
+
+/* =====================================================
+   HELPER
+===================================================== */
+
+function normalisasiNama(nama){
+    return String(nama).trim().replace(/\s+/g," ").toLowerCase();
+}
+
+function escapeHTML(text){
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+function rupiah(angka){
+    return new Intl.NumberFormat("id-ID",{
+        style:"currency",currency:"IDR",maximumFractionDigits:0
+    }).format(angka);
+}
+
+function formatSingkat(n){
+    const neg = n < 0 ? "-" : "";
+    n = Math.abs(n);
+    if(n >= 1000000) return neg + "Rp" + (n/1000000).toFixed(n%1000000===0?0:1) + "jt";
+    if(n >= 1000) return neg + "Rp" + (n/1000).toFixed(n%1000===0?0:1) + "rb";
+    return neg + "Rp" + Math.round(n);
+}
+
+function inisial(nama){
+    const p = String(nama).trim().split(/\s+/);
+    return ((p[0]||"?")[0] + (p[1] ? p[1][0] : "")).toUpperCase();
+}
+
+function warnaIndex(nama){
+    let h = 0;
+    for(const c of String(nama)) h = (h*31 + c.charCodeAt(0)) >>> 0;
+    return h % AVATAR_BG.length;
+}
+
+function icon(id, cls){
+    return `<svg class="i ${cls||""}"><use href="#i-${id}"/></svg>`;
+}
+
+function toast(msg, err){
+    const wrap = document.getElementById("toasts");
+    const el = document.createElement("div");
+    el.className = "toast" + (err ? " err" : "");
+    el.innerHTML = icon(err ? "alert" : "check") + "<span>" + escapeHTML(msg) + "</span>";
+    wrap.appendChild(el);
+    setTimeout(() => {
+        el.style.transition = ".3s";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 300);
+    }, 2600);
+}
+
+/* =====================================================
+   MODAL (pengganti confirm/prompt bawaan browser,
+   yang sering diblokir di preview / iframe)
+===================================================== */
+
+function modal(opt){
+    return new Promise(resolve => {
+        const back = document.getElementById("modalBack");
+        const box = document.getElementById("modalBox");
+        const fields = document.getElementById("mFields");
+        const ok = document.getElementById("mOk");
+        const cancel = document.getElementById("mCancel");
+
+        document.getElementById("mTitle").textContent = opt.title || "";
+        document.getElementById("mMsg").textContent = opt.msg || "";
+        document.getElementById("mMsg").style.display = opt.msg ? "block" : "none";
+        box.classList.toggle("danger", !!opt.danger);
+        ok.textContent = opt.okText || "OK";
+
+        fields.innerHTML = "";
+        (opt.fields || []).forEach(f => {
+            const w = document.createElement("div");
+            w.className = "field";
+            w.innerHTML = `<label>${escapeHTML(f.label)}</label>`;
+            const inp = document.createElement("input");
+            inp.className = "input";
+            inp.type = f.type || "text";
+            inp.value = f.value ?? "";
+            inp.dataset.key = f.key;
+            w.appendChild(inp);
+            fields.appendChild(w);
+        });
+
+        function tutup(hasil){
+            back.classList.remove("show");
+            ok.onclick = cancel.onclick = back.onclick = null;
+            document.removeEventListener("keydown", onKey);
+            resolve(hasil);
+        }
+        function kirim(){
+            if(!(opt.fields || []).length) return tutup(true);
+            const v = {};
+            fields.querySelectorAll("input").forEach(i => v[i.dataset.key] = i.value);
+            tutup(v);
+        }
+        function onKey(e){
+            if(e.key === "Escape") tutup(null);
+            if(e.key === "Enter") kirim();
+        }
+
+        ok.onclick = kirim;
+        cancel.onclick = () => tutup(null);
+        back.onclick = e => { if(e.target === back) tutup(null); };
+        document.addEventListener("keydown", onKey);
+
+        back.classList.add("show");
+        const first = fields.querySelector("input");
+        setTimeout(() => (first || ok).focus(), 30);
+    });
+}
+
+/* =====================================================
+   MIGRASI DATA LAMA (gabung nama kembar)
+===================================================== */
+
+function gabungkanDataLama(){
+    const hasil = [];
+    data.forEach(item => {
+        const key = normalisasiNama(item.nama);
+        const sudahAda = hasil.find(x => normalisasiNama(x.nama) === key);
+        if(sudahAda){
+            sudahAda.jumlah += Number(item.jumlah) || 0;
+        }else{
+            hasil.push({...item, jumlah:Number(item.jumlah) || 0});
+        }
+    });
+    data = hasil;
+    tulisStorage("storanData", data);
+}
+gabungkanDataLama();
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+function loadSetting(){
+    document.getElementById("hargaDefault").value = settings.harga;
+    document.getElementById("gajiDefault").value = settings.gaji;
+    updateInfoProfit();
+}
+
+function simpanSetting(){
+    settings.harga = Number(document.getElementById("hargaDefault").value) || 2500;
+    settings.gaji = Number(document.getElementById("gajiDefault").value) || 1000;
+    tulisStorage("storanSettings", settings);
+    updateInfoProfit();
+    renderSemua();
+    toast("Pengaturan harga disimpan");
+}
+
+function updateInfoProfit(){
+    const profit = settings.harga - settings.gaji;
+    const margin = settings.harga > 0 ? Math.round(profit / settings.harga * 100) : 0;
+    document.getElementById("keuntunganPerGmail").textContent = rupiah(profit);
+    document.getElementById("marginPersen").textContent = margin + "% margin";
+}
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function simpan(){
+    try{
+        localStorage.setItem("storanData", JSON.stringify(data));
+        localStorage.setItem("storanHistory", JSON.stringify(history));
+    }catch(e){
+        toast("Penyimpanan browser tidak tersedia, data hanya sementara.", true);
+    }
+}
+
+/* =====================================================
+   TAMBAH STORAN
+===================================================== */
+
+function tambahData(){
+    const inputNama = document.getElementById("nama").value.trim();
+    const jumlah = Number(document.getElementById("jumlah").value);
+    const hargaInput = Number(document.getElementById("harga").value);
+    const harga = hargaInput > 0 ? hargaInput : settings.harga;
+
+    if(!inputNama){ toast("Masukkan nama karyawan.", true); return; }
+    if(!jumlah || jumlah <= 0){ toast("Masukkan jumlah Gmail.", true); return; }
+
+    const key = normalisasiNama(inputNama);
+    const karyawanLama = data.find(item => normalisasiNama(item.nama) === key);
+
+    if(karyawanLama){
+        karyawanLama.jumlah += jumlah;
+    }else{
+        data.push({id:Date.now(), nama:inputNama, jumlah:jumlah, harga:harga});
+    }
+
+    history.unshift({
+        id:Date.now()+Math.random(),
+        nama:inputNama,
+        jumlah:jumlah,
+        harga:harga,
+        ts:Date.now(),
+        waktu:new Date().toLocaleString("id-ID")
+    });
+
+    simpan();
+    renderSemua();
+
+    document.getElementById("nama").value = "";
+    document.getElementById("jumlah").value = "";
+    document.getElementById("harga").value = "";
+
+    toast(karyawanLama
+        ? "Storan ditambahkan ke " + karyawanLama.nama
+        : "Karyawan baru berhasil ditambahkan");
+}
+
+/* =====================================================
+   HITUNG
+===================================================== */
+
+function hitung(item){
+    const omzet = item.jumlah * item.harga;
+    const gaji = item.jumlah * settings.gaji;
+    return {omzet, gaji, profit: omzet - gaji};
+}
+
+/* =====================================================
+   TAMPILKAN DATA
+===================================================== */
+
+function tampilkan(){
+    const tabel = document.getElementById("tabel");
+    const empty = document.getElementById("empty");
+    const keyword = document.getElementById("search").value.toLowerCase().trim();
+
+    tabel.innerHTML = "";
+
+    let allGmail = 0, allOmzet = 0, allProfit = 0, allGaji = 0;
+    data.forEach(item => {
+        const h = hitung(item);
+        allGmail += item.jumlah;
+        allOmzet += h.omzet;
+        allGaji += h.gaji;
+        allProfit += h.profit;
+    });
+
+    const urut = [...data].sort((a,b) => hitung(b).profit - hitung(a).profit);
+    const peringkat = new Map(urut.map((x,i) => [x.id, i+1]));
+    const maxProfit = Math.max(...urut.map(x => hitung(x).profit), 1);
+
+    const filtered = urut.filter(item => normalisasiNama(item.nama).includes(keyword));
+
+    empty.style.display = filtered.length === 0 ? "block" : "none";
+
+    filtered.forEach(item => {
+        const h = hitung(item);
+        const rank = peringkat.get(item.id);
+        const persen = allProfit > 0 ? Math.round(h.profit / allProfit * 100) : 0;
+        const lebar = Math.max(0, Math.round(h.profit / maxProfit * 100));
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><span class="rank ${rank<=3 ? "r"+rank : ""}">${rank}</span></td>
+            <td>
+                <div class="person">
+                    <div class="avatar" style="background:${AVATAR_BG[warnaIndex(item.nama)]}">${escapeHTML(inisial(item.nama))}</div>
+                    <div>
+                        <div class="person-name">${escapeHTML(item.nama)}</div>
+                        <div class="person-sub">${rupiah(item.harga)} / Gmail</div>
+                    </div>
+                </div>
+            </td>
+            <td class="num">${item.jumlah}</td>
+            <td class="num">${rupiah(h.omzet)}</td>
+            <td class="num salary">${rupiah(h.gaji)}</td>
+            <td class="num profit">${rupiah(h.profit)}</td>
+            <td>
+                <div class="share">
+                    <div class="bar"><i style="width:${lebar}%"></i></div>
+                    <span>${persen}%</span>
+                </div>
+            </td>
+            <td><span class="badge">${icon("check","sm")}STOR</span></td>
+            <td>
+                <button class="action" title="Edit" onclick="editData(${item.id})">${icon("edit","sm")}</button>
+                <button class="action delete" title="Hapus" onclick="hapusData(${item.id})">${icon("trash","sm")}</button>
+            </td>
+        `;
+        tabel.appendChild(row);
+    });
+
+    const margin = allOmzet > 0 ? Math.round(allProfit / allOmzet * 100) : 0;
+
+    document.getElementById("totalKaryawan").textContent = data.length;
+    document.getElementById("totalGmail").textContent = allGmail;
+    document.getElementById("totalOmzet").textContent = rupiah(allOmzet);
+    document.getElementById("totalProfit").textContent = rupiah(allProfit);
+    document.getElementById("pillMargin").textContent = margin + "% margin";
+    document.getElementById("hintKaryawan").textContent =
+        data.length ? "Terbaik: " + urut[0].nama : "Belum ada data";
+    document.getElementById("hintGmail").textContent =
+        "Rata-rata " + (data.length ? (allGmail/data.length).toFixed(1).replace(/\.0$/,"") : 0) + " / karyawan";
+    document.getElementById("hintOmzet").textContent = "Gaji terbayar " + rupiah(allGaji);
+}
+
+/* =====================================================
+   EDIT
+===================================================== */
+
+async function editData(id){
+    const item = data.find(x => x.id === id);
+    if(!item) return;
+
+    const v = await modal({
+        title:"Edit Karyawan",
+        okText:"Simpan",
+        fields:[
+            {key:"nama", label:"NAMA KARYAWAN", value:item.nama},
+            {key:"jumlah", label:"JUMLAH GMAIL", type:"number", value:item.jumlah}
+        ]
+    });
+    if(!v) return;
+
+    const namaBaru = String(v.nama).trim();
+    const jumlahBaru = Number(v.jumlah);
+
+    if(!namaBaru){ toast("Nama tidak boleh kosong.", true); return; }
+    if(!jumlahBaru || jumlahBaru <= 0){ toast("Jumlah tidak valid.", true); return; }
+
+    const bentrok = data.find(x =>
+        x.id !== id && normalisasiNama(x.nama) === normalisasiNama(namaBaru)
+    );
+
+    if(bentrok){
+        bentrok.jumlah += jumlahBaru;
+        data = data.filter(x => x.id !== id);
+        toast("Digabung dengan " + bentrok.nama);
+    }else{
+        item.nama = namaBaru;
+        item.jumlah = jumlahBaru;
+        toast("Data karyawan diperbarui");
+    }
+
+    simpan();
+    renderSemua();
+}
+
+/* =====================================================
+   HAPUS KARYAWAN
+===================================================== */
+
+async function hapusData(id){
+    const item = data.find(x => x.id === id);
+    if(!item) return;
+    const ya = await modal({
+        title:"Hapus karyawan?",
+        msg:"Data \"" + item.nama + "\" akan dihapus dari daftar karyawan. Riwayat storan tidak ikut terhapus.",
+        okText:"Hapus", danger:true
+    });
+    if(!ya) return;
+
+    data = data.filter(x => x.id !== id);
+    simpan();
+    renderSemua();
+    toast("Karyawan dihapus");
+}
+
+/* =====================================================
+   RIWAYAT
+===================================================== */
+
+function tampilkanHistory(){
+    const box = document.getElementById("history");
+    const empty = document.getElementById("historyEmpty");
+
+    box.innerHTML = "";
+
+    if(history.length === 0){
+        empty.style.display = "block";
+        return;
+    }
+    empty.style.display = "none";
+
+    history.forEach(item => {
+        const h = hitung(item);
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `
+            <div class="history-icon">${icon("mail")}</div>
+            <div class="history-main">
+                <div class="history-name">${escapeHTML(item.nama)}</div>
+                <div class="history-detail">
+                    ${item.jumlah} Gmail • Omzet ${rupiah(h.omzet)} • Gaji ${rupiah(h.gaji)}
+                </div>
+            </div>
+            <div class="history-right">
+                <div class="history-profit num">+${rupiah(h.profit)}</div>
+                <div class="history-time">${escapeHTML(item.waktu)}</div>
+            </div>
+        `;
+        box.appendChild(div);
+    });
+}
+
+async function hapusRiwayat(){
+    if(history.length === 0){ toast("Riwayat masih kosong.", true); return; }
+    const ya = await modal({
+        title:"Hapus seluruh riwayat?",
+        msg:"Semua catatan transaksi akan dihapus. Data karyawan tidak berubah.",
+        okText:"Hapus Riwayat", danger:true
+    });
+    if(!ya) return;
+
+    history = [];
+    simpan();
+    renderSemua();
+    toast("Riwayat dihapus");
+}
+
+/* =====================================================
+   HAPUS SEMUA DATA (karyawan + riwayat)
+===================================================== */
+
+async function hapusSemua(){
+    if(data.length === 0 && history.length === 0){
+        toast("Data masih kosong.", true);
+        return;
+    }
+    const ya = await modal({
+        title:"Hapus semua data?",
+        msg:"Semua karyawan dan seluruh riwayat akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.",
+        okText:"Ya, Hapus Semua", danger:true
+    });
+    if(!ya) return;
+
+    data = [];
+    history = [];
+    simpan();
+    renderSemua();
+    toast("Semua data berhasil dihapus");
+}
+
+/* =====================================================
+   EXPORT CSV
+===================================================== */
+
+function exportCSV(){
+    if(history.length === 0){ toast("Belum ada riwayat.", true); return; }
+
+    let csv = "Nama,Jumlah Gmail,Omzet,Gaji,Keuntungan,Waktu\n";
+    history.forEach(item => {
+        const h = hitung(item);
+        csv += `"${String(item.nama).replace(/"/g,'""')}",${item.jumlah},${h.omzet},${h.gaji},${h.profit},"${item.waktu}"\n`;
+    });
+
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "riwayat-storan.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Riwayat berhasil diexport");
+}
+
+/* =====================================================
+   CHART - UTIL
+===================================================== */
+
+function prep(canvas){
+    const r = canvas.getBoundingClientRect();
+    const d = window.devicePixelRatio || 1;
+    canvas.width = r.width * d;
+    canvas.height = r.height * d;
+    const c = canvas.getContext("2d");
+    c.setTransform(d,0,0,d,0,0);
+    c.clearRect(0,0,r.width,r.height);
+    return {c, w:r.width, h:r.height};
+}
+
+function niceScale(max){
+    if(max <= 0) return {max:4, step:1};
+    const rough = max / 4;
+    const p = Math.pow(10, Math.floor(Math.log10(rough)));
+    const f = rough / p;
+    const nf = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10;
+    const step = nf * p;
+    return {max: step*4, step};
+}
+
+function roundRectTop(ctx,x,y,w,h,r){
+    if(h <= 0) return;
+    r = Math.min(r, w/2, h);
+    ctx.beginPath();
+    ctx.moveTo(x, y+h);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h);
+    ctx.closePath();
+}
+
+function drawGrid(ctx, scale, L, T, cw, ch, w, R){
+    ctx.strokeStyle = "rgba(255,255,255,.06)";
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#657087";
+    ctx.font = "10px Inter,Arial";
+    ctx.textAlign = "right";
+    for(let i=0;i<=4;i++){
+        const y = T + ch - (ch/4)*i;
+        ctx.beginPath();
+        ctx.setLineDash(i === 0 ? [] : [4,5]);
+        ctx.moveTo(L,y);
+        ctx.lineTo(w-R,y);
+        ctx.stroke();
+        ctx.fillText(formatSingkat(scale.step*i), L-9, y+3);
+    }
+    ctx.setLineDash([]);
+}
+
+/* =====================================================
+   CHART - MODE
+===================================================== */
+
+function setMode(mode){
+    chartMode = mode;
+    document.getElementById("tabKaryawan").classList.toggle("active", mode === "karyawan");
+    document.getElementById("tabTren").classList.toggle("active", mode === "tren");
+    document.getElementById("chartSubtitle").textContent =
+        mode === "karyawan" ? "Keuntungan setiap karyawan" : "Keuntungan per hari dari riwayat storan";
+    hideTip();
+    gambarGrafik();
+}
+
+function kosong(ctx,w,h,teks){
+    ctx.fillStyle = "#5a657b";
+    ctx.font = "13px Inter,Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(teks, w/2, h/2);
+}
+
+/* =====================================================
+   CHART - PER KARYAWAN (BAR)
+===================================================== */
+
+function gambarBar(hover){
+    const {c:ctx, w, h} = prep(document.getElementById("profitChart"));
+    barHits = [];
+
+    if(data.length === 0){ kosong(ctx,w,h,"Belum ada data untuk grafik"); return; }
+
+    const items = [...data]
+        .map(x => ({nama:x.nama, jumlah:x.jumlah, ...hitung(x)}))
+        .sort((a,b) => b.profit - a.profit)
+        .slice(0,10);
+
+    const max = Math.max(...items.map(x => x.profit), 1);
+    const scale = niceScale(max);
+
+    const L = 54, R = 14, T = 26, B = 42;
+    const cw = w - L - R, ch = h - T - B;
+
+    drawGrid(ctx, scale, L, T, cw, ch, w, R);
+
+    const slot = cw / items.length;
+    const bw = Math.min(56, slot * .56);
+
+    items.forEach((it, i) => {
+        const bh = Math.max(0, it.profit / scale.max * ch);
+        const x = L + slot*i + (slot-bw)/2;
+        const y = T + ch - bh;
+        const active = hover === i;
+
+        if(active){
+            ctx.fillStyle = "rgba(255,255,255,.04)";
+            ctx.fillRect(L + slot*i, T, slot, ch);
+        }
+
+        const g = ctx.createLinearGradient(0,y,0,T+ch);
+        if(i === 0){
+            g.addColorStop(0,"#ffd978");
+            g.addColorStop(1,"#ff9f43");
+        }else{
+            g.addColorStop(0,"#8b7bff");
+            g.addColorStop(1,"#38d9c0");
+        }
+
+        ctx.save();
+        if(active){ ctx.shadowColor = i===0 ? "rgba(255,200,97,.5)" : "rgba(139,123,255,.55)"; ctx.shadowBlur = 18; }
+        ctx.globalAlpha = hover === null || hover === undefined || active ? 1 : .55;
+        ctx.fillStyle = g;
+        roundRectTop(ctx,x,y,bw,bh,9);
+        ctx.fill();
+        ctx.restore();
+
+        // nilai di atas bar
+        ctx.fillStyle = active ? "#fff" : "#aab4c8";
+        ctx.font = "700 10px Inter,Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(formatSingkat(it.profit), x + bw/2, y - 8);
+
+        // nama
+        ctx.fillStyle = active ? "#fff" : "#7f899d";
+        ctx.font = "10.5px Inter,Arial";
+        let nm = it.nama;
+        const lim = slot < 60 ? 6 : 10;
+        if(nm.length > lim) nm = nm.slice(0, lim-1) + "…";
+        ctx.fillText(nm, x + bw/2, h - 18);
+
+        // mahkota juara
+        if(i === 0 && bh > 0){
+            ctx.fillStyle = "#ffd978";
+            ctx.font = "11px Arial";
+            ctx.fillText("★", x + bw/2, y - 22);
+        }
+
+        barHits.push({x:L + slot*i, w:slot, cx:x+bw/2, y, it, rank:i+1});
+    });
+}
+
+/* =====================================================
+   CHART - TREN HARIAN (LINE / AREA)
+===================================================== */
+
+function kumpulHarian(){
+    const map = new Map();
+    history.forEach(item => {
+        let key, sort;
+        if(item.ts){
+            const d = new Date(item.ts);
+            key = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear();
+            sort = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+        }else{
+            const part = String(item.waktu).split(",")[0].trim().split(/[\/.\-]/);
+            if(part.length < 3) return;
+            const dd = +part[0], mm = +part[1], yy = +part[2];
+            key = dd + "/" + mm + "/" + yy;
+            sort = new Date(yy, mm-1, dd).getTime();
+        }
+        if(!map.has(key)) map.set(key, {key, sort, profit:0, gmail:0, omzet:0});
+        const e = map.get(key);
+        const h = hitung(item);
+        e.profit += h.profit;
+        e.omzet += h.omzet;
+        e.gmail += item.jumlah;
+    });
+    return [...map.values()].sort((a,b) => a.sort - b.sort).slice(-14);
+}
+
+function gambarLine(hover){
+    const {c:ctx, w, h} = prep(document.getElementById("profitChart"));
+    lineHits = [];
+
+    const days = kumpulHarian();
+    if(days.length === 0){ kosong(ctx,w,h,"Belum ada riwayat untuk tren harian"); return; }
+
+    const max = Math.max(...days.map(d => d.profit), 1);
+    const scale = niceScale(max);
+
+    const L = 54, R = 22, T = 26, B = 42;
+    const cw = w - L - R, ch = h - T - B;
+
+    drawGrid(ctx, scale, L, T, cw, ch, w, R);
+
+    const n = days.length;
+    const px = i => n === 1 ? L + cw/2 : L + 14 + (cw-28) * i/(n-1);
+    const py = v => T + ch - v / scale.max * ch;
+    const pts = days.map((d,i) => ({x:px(i), y:py(d.profit), d}));
+
+    // area
+    if(n > 1){
+        const grad = ctx.createLinearGradient(0,T,0,T+ch);
+        grad.addColorStop(0,"rgba(139,123,255,.38)");
+        grad.addColorStop(1,"rgba(56,217,192,0)");
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, T+ch);
+        ctx.lineTo(pts[0].x, pts[0].y);
+        for(let i=1;i<n;i++){
+            const mx = (pts[i-1].x + pts[i].x)/2;
+            ctx.bezierCurveTo(mx, pts[i-1].y, mx, pts[i].y, pts[i].x, pts[i].y);
+        }
+        ctx.lineTo(pts[n-1].x, T+ch);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // garis
+        const lg = ctx.createLinearGradient(L,0,w-R,0);
+        lg.addColorStop(0,"#8b7bff");
+        lg.addColorStop(1,"#38d9c0");
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for(let i=1;i<n;i++){
+            const mx = (pts[i-1].x + pts[i].x)/2;
+            ctx.bezierCurveTo(mx, pts[i-1].y, mx, pts[i].y, pts[i].x, pts[i].y);
+        }
+        ctx.strokeStyle = lg;
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.shadowColor = "rgba(139,123,255,.5)";
+        ctx.shadowBlur = 12;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    }
+
+    // titik + label
+    const every = Math.ceil(n / 7);
+    pts.forEach((p,i) => {
+        const active = hover === i;
+
+        if(active){
+            ctx.strokeStyle = "rgba(255,255,255,.15)";
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4,4]);
+            ctx.beginPath();
+            ctx.moveTo(p.x, T);
+            ctx.lineTo(p.x, T+ch);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, active ? 7 : 4.5, 0, Math.PI*2);
+        ctx.fillStyle = "#0a0f19";
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = active ? "#fff" : "#8b7bff";
+        ctx.stroke();
+
+        if(i % every === 0 || i === n-1){
+            ctx.fillStyle = active ? "#fff" : "#7f899d";
+            ctx.font = "10.5px Inter,Arial";
+            ctx.textAlign = "center";
+            const parts = p.d.key.split("/");
+            ctx.fillText(parts[0] + "/" + parts[1], p.x, h - 18);
+        }
+
+        lineHits.push({x:p.x, y:p.y, d:p.d});
+    });
+}
+
+/* =====================================================
+   CHART - RINGKASAN & DONUT
+===================================================== */
+
+function gambarRingkasan(){
+    const box = document.getElementById("chartSummary");
+    if(data.length === 0){ box.innerHTML = ""; return; }
+
+    if(chartMode === "karyawan"){
+        const urut = [...data].sort((a,b) => hitung(b).profit - hitung(a).profit);
+        const total = data.reduce((s,x) => s + hitung(x).profit, 0);
+        box.innerHTML = `
+            <div class="chip">${icon("crown","sm")}Terbaik <b>${escapeHTML(urut[0].nama)}</b></div>
+            <div class="chip">${icon("coins","sm")}Rata-rata <b class="num">${rupiah(total/data.length)}</b></div>
+            <div class="chip">${icon("users","sm")}Ditampilkan <b>${Math.min(10,data.length)}</b> dari ${data.length}</div>
+        `;
+    }else{
+        const days = kumpulHarian();
+        if(!days.length){ box.innerHTML = ""; return; }
+        const best = days.reduce((a,b) => b.profit > a.profit ? b : a);
+        const tot = days.reduce((s,d) => s + d.profit, 0);
+        box.innerHTML = `
+            <div class="chip">${icon("crown","sm")}Hari terbaik <b>${best.key}</b></div>
+            <div class="chip">${icon("coins","sm")}Rata-rata/hari <b class="num">${rupiah(tot/days.length)}</b></div>
+            <div class="chip">${icon("calendar","sm")}<b>${days.length}</b> hari terakhir</div>
+        `;
+    }
+}
+
+function gambarDonut(){
+    const {c:ctx, w, h} = prep(document.getElementById("donutChart"));
+    const legend = document.getElementById("legend");
+
+    const list = [...data]
+        .map(x => ({nama:x.nama, profit:Math.max(0,hitung(x).profit)}))
+        .sort((a,b) => b.profit - a.profit);
+    const total = list.reduce((s,x) => s + x.profit, 0);
+
+    if(list.length === 0 || total <= 0){
+        kosong(ctx,w,h,"Belum ada data");
+        legend.innerHTML = "";
+        return;
+    }
+
+    let seg = list.slice(0,5);
+    const sisa = list.slice(5).reduce((s,x) => s + x.profit, 0);
+    if(sisa > 0) seg.push({nama:"Lainnya", profit:sisa});
+
+    const cx = w/2, cy = h/2, r = Math.min(w,h)/2 - 8, ir = r * .66;
+    let start = -Math.PI/2;
+
+    seg.forEach((s,i) => {
+        const ang = s.profit / total * Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(cx,cy,r,start+.03,start+ang-.03);
+        ctx.arc(cx,cy,ir,start+ang-.03,start+.03,true);
+        ctx.closePath();
+        ctx.fillStyle = PALETTE[i % PALETTE.length];
+        ctx.fill();
+        start += ang;
+    });
+
+    ctx.fillStyle = "#f3f6fc";
+    ctx.font = "800 17px Inter,Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(formatSingkat(total), cx, cy+3);
+    ctx.fillStyle = "#7f899d";
+    ctx.font = "10.5px Inter,Arial";
+    ctx.fillText("Total profit", cx, cy+20);
+
+    legend.innerHTML = seg.map((s,i) => `
+        <div class="legend-item">
+            <span class="swatch" style="background:${PALETTE[i % PALETTE.length]}"></span>
+            <span class="nm">${escapeHTML(s.nama)}</span>
+            <span class="pc">${Math.round(s.profit/total*100)}%</span>
+        </div>
+    `).join("");
+}
+
+function gambarGrafik(hover){
+    if(chartMode === "karyawan") gambarBar(hover); else gambarLine(hover);
+    gambarRingkasan();
+    gambarDonut();
+}
+
+/* =====================================================
+   CHART - TOOLTIP / HOVER
+===================================================== */
+
+const tip = document.getElementById("tooltip");
+function hideTip(){ tip.style.opacity = 0; }
+
+function chartPointer(e){
+    const canvas = document.getElementById("profitChart");
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    const mx = t.clientX - r.left;
+
+    let idx = null, tx = 0, ty = 0, html = "";
+
+    if(chartMode === "karyawan"){
+        barHits.forEach((b,i) => { if(mx >= b.x && mx <= b.x + b.w) idx = i; });
+        if(idx !== null){
+            const b = barHits[idx];
+            tx = b.cx; ty = b.y;
+            html = `<b>${escapeHTML(b.it.nama)}</b>
+                <div>Peringkat <em>#${b.rank}</em></div>
+                <div>Gmail: ${b.it.jumlah}</div>
+                <div>Omzet: ${rupiah(b.it.omzet)}</div>
+                <div>Gaji: ${rupiah(b.it.gaji)}</div>
+                <div>Profit: <em>${rupiah(b.it.profit)}</em></div>`;
+        }
+    }else{
+        let best = Infinity;
+        lineHits.forEach((p,i) => {
+            const dist = Math.abs(p.x - mx);
+            if(dist < best){ best = dist; idx = i; }
+        });
+        if(idx !== null){
+            const p = lineHits[idx];
+            tx = p.x; ty = p.y;
+            html = `<b>${p.d.key}</b>
+                <div>Gmail: ${p.d.gmail}</div>
+                <div>Omzet: ${rupiah(p.d.omzet)}</div>
+                <div>Profit: <em>${rupiah(p.d.profit)}</em></div>`;
+        }
+    }
+
+    if(idx === null){ hideTip(); gambarGrafikHoverOnly(null); return; }
+
+    tip.innerHTML = html;
+    tip.style.left = Math.min(Math.max(tx, 70), r.width - 70) + "px";
+    tip.style.top = (ty - 4) + "px";
+    tip.style.opacity = 1;
+    gambarGrafikHoverOnly(idx);
+}
+
+function gambarGrafikHoverOnly(idx){
+    if(chartMode === "karyawan") gambarBar(idx); else gambarLine(idx);
+}
+
+(function(){
+    const canvas = document.getElementById("profitChart");
+    canvas.addEventListener("mousemove", chartPointer);
+    canvas.addEventListener("touchstart", chartPointer, {passive:true});
+    canvas.addEventListener("touchmove", chartPointer, {passive:true});
+    canvas.addEventListener("mouseleave", () => { hideTip(); gambarGrafikHoverOnly(null); });
+})();
+
+/* =====================================================
+   RENDER & START
+===================================================== */
+
+function renderSemua(){
+    tampilkan();
+    tampilkanHistory();
+    gambarGrafik();
+}
+
+document.getElementById("tanggalHariIni").textContent =
+    new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+loadSetting();
+renderSemua();
+
+let resizeTimer;
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(gambarGrafik, 80);
+});
+
+</script>
+
+</body>
+</html>
